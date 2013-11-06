@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="ic_base_serializer.object_constructor" alias="jms_serializer.doctrine_object_constructor" public="false"/>
+
+        <service id="ic_base_serializer.circular_serialization_listener" class="IC\Bundle\Base\SerializerBundle\EventListener\Serializer\CircularSerializationListener">
+            <tag name="jms_serializer.event_subscriber"/>
+        </service>
+
+        <service id="ic_base_serializer.serialize_listener" class="IC\Bundle\Base\SerializerBundle\EventListener\Serializer\SerializeListener">
+            <tag name="jms_serializer.event_subscriber"/>
+            <call method="setEntityManager">
+                <argument type="service" id="doctrine.orm.default_entity_manager"/>
+            </call>
+            <call method="setTranslator">
+                <argument type="service" id="translator"/>
+            </call>
+            <call method="setMetadataFactory">
+                <argument type="service" id="ic_base_serializer.metadata.factory"/>
+            </call>
+        </service>
+    </services>
+
+</container>
