@@ -113,8 +113,9 @@ class ProxyHandlerTest extends TestCase
      */
     public function testShouldHandleSerialization()
     {
-        $visitorMock = $this->createVisitorMock(new \stdClass());
-        $entityMock  = $this->createProxyMock(false);
+        $entity      = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Core\UserBundle\Entity\User', 1);
+        $visitorMock = $this->createVisitorMock($entity);
+        $entityMock  = $entity;
         $typeMock    = $this->createTypeMock();
         $contextMock = $this->createContextMock(false);
 

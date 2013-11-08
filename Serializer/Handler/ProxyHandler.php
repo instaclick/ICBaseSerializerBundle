@@ -8,6 +8,7 @@ use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\SkipStepException;
 use IC\Bundle\Core\SecurityBundle\Routing\Router;
+use IC\Bundle\Base\ComponentBundle\Entity\Entity;
 use PhpOption\None;
 
 /**
@@ -69,15 +70,21 @@ class ProxyHandler implements SubscribingHandlerInterface
     {
         $flag = $context->attributes->get(self::ENABLE_HANDLER);
 
-        if ($visitor->getRoot() === null // the entity is the root node.
-            || $flag instanceof None // the enable flag is not present.
-            || ( ! $entity instanceof Proxy) // the given entity is not a proxy.
-            || (
-                $entity instanceof Proxy
-                && $entity->__isInitialized() // the given entity is an initialized proxy.
-            )
-        ) {
-            throw new SkipStepException('Skip This');
+
+        if ($visitor->getRoot() === null) {
+            throw new SkipStepException('Skip the root');
+        }
+
+        if ($flag instanceof None) {
+            throw new SkipStepException('Skip no flag');
+        }
+
+        if (($entity instanceof Proxy && $entity->__isInitialized())) {
+            throw new SkipStepException('Skip the proxy');
+        }
+
+        if ( ! ($entity instanceof Entity)) {
+            throw new SkipStepException('Skip the entity');
         }
 
         $typePartList  = explode('\\', $type['name']);
