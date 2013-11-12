@@ -28,7 +28,7 @@ class DoctrineProxySubscriber extends DoctrineProxySubscriberBase
     {
         $object = $event->getObject();
 
-        if ( ! $object instanceof Proxy && ! $object instanceof ORMProxy) {
+        if ($object instanceof Proxy || $object instanceof ORMProxy) {
             return;
         }
 

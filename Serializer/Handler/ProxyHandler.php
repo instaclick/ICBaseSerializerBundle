@@ -70,7 +70,6 @@ class ProxyHandler implements SubscribingHandlerInterface
     {
         $flag = $context->attributes->get(self::ENABLE_HANDLER);
 
-
         if ($visitor->getRoot() === null) {
             throw new SkipStepException('Skip the root');
         }
@@ -79,12 +78,16 @@ class ProxyHandler implements SubscribingHandlerInterface
             throw new SkipStepException('Skip no flag');
         }
 
-        if (($entity instanceof Proxy && $entity->__isInitialized())) {
-            throw new SkipStepException('Skip the proxy');
+        if ( ! ($entity instanceof Entity)) {
+            throw new SkipStepException('Skip the non-entity');
         }
 
-        if ( ! ($entity instanceof Entity)) {
+        if ( ! $entity instanceof Proxy && $entity instanceof Entity) {
             throw new SkipStepException('Skip the entity');
+        }
+
+        if (($entity instanceof Proxy && $entity->__isInitialized())) {
+            throw new SkipStepException('Skip the proxy');
         }
 
         $typePartList  = explode('\\', $type['name']);

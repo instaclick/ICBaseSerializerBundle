@@ -36,28 +36,18 @@ class CaseZeroCommand extends ContainerAwareCommand
         $repo = $this->getContainer()->get('ic_core_user.repository.user');
         $ser  = $this->getContainer()->get('serializer');
 
-        $user = $repo->get(1);
+        $entity = $repo->get(1);
 
-        //\Doctrine\Common\Util\Debug::dump($user);
-        //die;
+        try {
+            $json = $ser->serialize($entity, 'json', $context);
+            $x = json_decode($json);
+        } catch (\Exception $e) {
+            var_dump($e->getTraceAsString());
+            var_dump($e->getMessage());
+            die;
+        }
 
-        // $json = $ser->serialize($user, 'json');
-        // $x    = json_decode($json);
-        // var_dump($x);
-        // echo "Finished the full json\n";
-
-        echo "Printing the caped one in 6sec\n";
-        //sleep(6);
-
-        $json = $ser->serialize($user, 'json', $context);
-        $x    = json_decode($json);
+        echo PHP_EOL;
         var_dump($x);
-
-        // echo "Printing the deserialized Profile 1 getContent in 6sec\n";
-        // sleep(6);
-
-        // $obj = $ser->deserialize($json, 'IC\Bundle\Core\UserBundle\Entity\User', 'json');
-        // $p1  = $obj->getProfileList();
-        // var_dump($p1[0]->getContent());
     }
 }
