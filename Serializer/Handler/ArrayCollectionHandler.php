@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Handler\ArrayCollectionHandler as BaseArrayCollectionHandler;
 use IC\Bundle\Core\SecurityBundle\Routing\Router;
 use Doctrine\ORM\PersistentCollection;
+use PhpOption\None;
 
 /**
  * This handler prevent to load a collectio and provide the REST Api Filter entrypoint for it
@@ -16,6 +17,9 @@ use Doctrine\ORM\PersistentCollection;
  */
 class ArrayCollectionHandler extends BaseArrayCollectionHandler
 {
+    const SKIP_HANDLER   = 'skip_json_handler';
+    const ENABLE_HANDLER = 'enable_json_handler';
+
     /**
      * @var \IC\Bundle\Core\SecurityBundle\Routing\Router
      */
@@ -36,7 +40,9 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
      */
     public function serializeCollection(VisitorInterface $visitor, Collection $collection, array $type, Context $context)
     {
-        if (( ! $collection instanceof PersistentCollection) || $collection->isInitialized()) {
+        $flag = $context->attributes->get(self::ENABLE_HANDLER);
+
+        if (($flag instanceof None) || ( ! $collection instanceof PersistentCollection) || $collection->isInitialized()) {
             return $visitor->visitArray($collection, $type, $context);
         }
 
