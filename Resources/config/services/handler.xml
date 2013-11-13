@@ -7,6 +7,7 @@
         <parameter key="jms_serializer.array_collection_handler.class">IC\Bundle\Base\SerializerBundle\Serializer\Handler\ArrayCollectionHandler</parameter>
         <parameter key="ic_base_serializer.handler.proxy_handler.class">IC\Bundle\Base\SerializerBundle\Serializer\Handler\ProxyHandler</parameter>
         <parameter key="ic_base_serializer.handler.entity_collection_handler.class">IC\Bundle\Base\SerializerBundle\Serializer\Handler\ArrayCollectionHandler</parameter>
+         <parameter key="ic_base_serializer.handler.closure_handler.class">IC\Bundle\Base\SerializerBundle\Serializer\Handler\ClosureHandler</parameter>
     </parameters>
 
     <services>
@@ -17,6 +18,12 @@
             <call method="setRouter">
                 <argument type="service" id="router"/>
             </call>
+        </service>
+
+        <service id="ic_base_serializer.handler.closure_handler"
+            class="%ic_base_serializer.handler.closure_handler.class%"
+            public="true">
+            <tag name="jms_serializer.subscribing_handler" />
         </service>
 
         <service id="ic_base_serializer.handler.entity_collection_handler"

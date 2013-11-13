@@ -47,7 +47,6 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
         }
 
         $className           = $collection->getTypeClass()->name;
-        $type['name']        = $className;
         $parent              = $collection->getOwner();
         $parentClassPartList = explode('\\', get_class($parent));
         $parentClassName     = lcfirst($parentClassPartList[(count($parentClassPartList) - 1)]);
