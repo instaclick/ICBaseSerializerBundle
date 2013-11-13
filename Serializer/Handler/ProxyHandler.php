@@ -98,10 +98,6 @@ class ProxyHandler implements SubscribingHandlerInterface
 
         $route = $this->router->generate('ICBaseRestBundle_Rest_Get', $parameterList, Router::ABSOLUTE_URL);
 
-        if ($entity instanceof \IC\Bundle\Core\SexualBundle\Entity\Type) {
-            throw new \Exception('...');
-        }
-
         return array(
             'id'   => $entity->getId(),
             '_url' => $route,
