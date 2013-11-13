@@ -46,9 +46,30 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
             return $visitor->visitArray($collection, $type, $context);
         }
 
-        $className           = $collection->getTypeClass()->name;
-        $parent              = $collection->getOwner();
-        $parentClassPartList = explode('\\', get_class($parent));
+        $classMetadata  = $collection->getTypeClass();
+        $associationMap = $classMetadata->getAssociationMappings();
+        $className      = $classMetadata->name;
+
+        $parent                = $collection->getOwner();
+        $actualParentClassName = get_class($parent);
+
+        $hasReverseMapping = false;
+
+        foreach ($associationMap as $fieldName => $mappingInfo) {
+            if ($mappingInfo['targetEntity'] !== $actualParentClassName) {
+                continue;
+            }
+
+            $hasReverseMapping = ! empty($mappingInfo['inversedBy']);
+
+            break;
+        }
+
+        if ( ! $hasReverseMapping) {
+            return $visitor->visitArray($collection, $type, $context);
+        }
+
+        $parentClassPartList = explode('\\', $actualParentClassName);
         $parentClassName     = lcfirst($parentClassPartList[(count($parentClassPartList) - 1)]);
         $parentId            = $parent->getId();
         $typePartList        = explode('\\', $className);
@@ -61,7 +82,7 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
         $route = $this->router->generate('ICBaseRestBundle_Rest_Filter', $parameterList, Router::ABSOLUTE_URL);
         $route = "{$route}?{$parentClassName}={$parentId}";
         $data  = array(
-            '_url'       => $route,
+            '_url' => $route,
         );
 
         return $visitor->visitArray($data, $type, $context);
