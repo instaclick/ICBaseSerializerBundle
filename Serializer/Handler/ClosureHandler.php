@@ -2,6 +2,7 @@
 namespace IC\Bundle\Base\SerializerBundle\Serializer\Handler;
 
 use JMS\Serializer\Context;
+use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\VisitorInterface;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 
