@@ -9,6 +9,7 @@ use JMS\Serializer\Context;
 use JMS\Serializer\Exception\SkipStepException;
 use IC\Bundle\Core\SecurityBundle\Routing\Router;
 use IC\Bundle\Base\ComponentBundle\Entity\Entity;
+use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use PhpOption\None;
 
 /**
@@ -19,9 +20,6 @@ use PhpOption\None;
  */
 class ProxyHandler implements SubscribingHandlerInterface
 {
-    const SKIP_HANDLER   = 'skip_json_handler';
-    const ENABLE_HANDLER = 'enable_json_handler';
-
     /**
      * @var \IC\Bundle\Core\SecurityBundle\Routing\Router
      */
@@ -68,14 +66,14 @@ class ProxyHandler implements SubscribingHandlerInterface
      */
     public function serializeProxy(JsonSerializationVisitor $visitor, $entity, array $type, Context $context)
     {
-        $flag = $context->attributes->get(self::ENABLE_HANDLER);
-
-        if ($visitor->getRoot() === null) {
-            throw new SkipStepException('Skip the root');
-        }
+        $flag = $context->attributes->get(ProxyHandlerFlag::ENABLE_HANDLER);
 
         if ($flag instanceof None) {
             throw new SkipStepException('Skip no flag');
+        }
+
+        if ($visitor->getRoot() === null) {
+            throw new SkipStepException('Skip the root');
         }
 
         if ( ! ($entity instanceof Entity)) {
@@ -99,6 +97,10 @@ class ProxyHandler implements SubscribingHandlerInterface
         );
 
         $route = $this->router->generate('ICBaseRestBundle_Rest_Get', $parameterList, Router::ABSOLUTE_URL);
+
+        if ($entity instanceof \IC\Bundle\Core\SexualBundle\Entity\Type) {
+            throw new \Exception('...');
+        }
 
         return array(
             'id'   => $entity->getId(),

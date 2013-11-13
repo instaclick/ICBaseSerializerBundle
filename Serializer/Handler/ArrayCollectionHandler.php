@@ -4,12 +4,12 @@ namespace IC\Bundle\Base\SerializerBundle\Serializer\Handler;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use IC\Bundle\Core\SecurityBundle\Routing\Router;
+use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use IC\Bundle\Base\SerializerBundle\Exception\NoMappingException;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\ArrayCollectionHandler as BaseArrayCollectionHandler;
 use JMS\Serializer\VisitorInterface;
-
 use PhpOption\None;
 
 /**
@@ -19,9 +19,6 @@ use PhpOption\None;
  */
 class ArrayCollectionHandler extends BaseArrayCollectionHandler
 {
-    const SKIP_HANDLER   = 'skip_json_handler';
-    const ENABLE_HANDLER = 'enable_json_handler';
-
     /**
      * @var \IC\Bundle\Core\SecurityBundle\Routing\Router
      */
@@ -42,7 +39,7 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
      */
     public function serializeCollection(VisitorInterface $visitor, Collection $collection, array $type, Context $context)
     {
-        $flag = $context->attributes->get(self::ENABLE_HANDLER);
+        $flag = $context->attributes->get(ProxyHandlerFlag::ENABLE_HANDLER);
 
         if (($flag instanceof None) || ( ! $collection instanceof PersistentCollection) || $collection->isInitialized()) {
             return $visitor->visitArray($collection, $type, $context);
@@ -55,7 +52,7 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
         $parent          = $collection->getOwner();
         $parentClassName = get_class($parent);
 
-        $mappingInfo       = $this->getParentMappingInformation($associationMap, $parentClassName);
+        $mappingInfo = $this->getParentMappingInformation($associationMap, $parentClassName);
 
         if (empty($mappingInfo['inversedBy'])) {
             return $visitor->visitArray($collection, $type, $context);
