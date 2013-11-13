@@ -1,13 +1,15 @@
 <?php
 namespace IC\Bundle\Base\SerializerBundle\Serializer\Handler;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\PersistentCollection;
+use IC\Bundle\Core\SecurityBundle\Routing\Router;
+use IC\Bundle\Base\SerializerBundle\Exception\NoMappingException;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
-use JMS\Serializer\VisitorInterface;
-use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Handler\ArrayCollectionHandler as BaseArrayCollectionHandler;
-use IC\Bundle\Core\SecurityBundle\Routing\Router;
-use Doctrine\ORM\PersistentCollection;
+use JMS\Serializer\VisitorInterface;
+
 use PhpOption\None;
 
 /**
@@ -50,41 +52,73 @@ class ArrayCollectionHandler extends BaseArrayCollectionHandler
         $associationMap = $classMetadata->getAssociationMappings();
         $className      = $classMetadata->name;
 
-        $parent                = $collection->getOwner();
-        $actualParentClassName = get_class($parent);
+        $parent          = $collection->getOwner();
+        $parentClassName = get_class($parent);
 
-        $hasReverseMapping = false;
+        $mappingInfo       = $this->getParentMappingInformation($associationMap, $parentClassName);
 
-        foreach ($associationMap as $fieldName => $mappingInfo) {
-            if ($mappingInfo['targetEntity'] !== $actualParentClassName) {
-                continue;
-            }
-
-            $hasReverseMapping = ! empty($mappingInfo['inversedBy']);
-
-            break;
-        }
-
-        if ( ! $hasReverseMapping) {
+        if (empty($mappingInfo['inversedBy'])) {
             return $visitor->visitArray($collection, $type, $context);
         }
 
-        $parentClassPartList = explode('\\', $actualParentClassName);
-        $parentClassName     = lcfirst($parentClassPartList[(count($parentClassPartList) - 1)]);
-        $parentId            = $parent->getId();
-        $typePartList        = explode('\\', $className);
-        $parameterList       = array(
+        $fieldName = $mappingInfo['fieldName'];
+        $parentId  = $parent->getId();
+        $route     = $this->constructUrlToRestApi($fieldName, $className, $parentId);
+
+        $data = array(
+            '_url' => $route,
+        );
+
+        return $visitor->visitArray($data, $type, $context);
+    }
+
+    /**
+     * Construct the URL to the corresponding endpoint (REST API)
+     *
+     * @param string         $fieldName the name of the field
+     * @param string         $className the fully qualified class name
+     * @param string|integer $entityId  the identifier of the entity
+     *
+     * @return string
+     */
+    private function constructUrlToRestApi($fieldName, $className, $entityId)
+    {
+        $typePartList = explode('\\', $className);
+
+        $parameterList = array(
             'packageName'    => strtolower($typePartList[2]),
             'subPackageName' => strtolower(substr($typePartList[3], 0, strpos($typePartList[3], 'Bundle'))),
             'entityName'     => strtolower($typePartList[5]),
         );
 
         $route = $this->router->generate('ICBaseRestBundle_Rest_Filter', $parameterList, Router::ABSOLUTE_URL);
-        $route = "{$route}?{$parentClassName}={$parentId}";
-        $data  = array(
-            '_url' => $route,
-        );
 
-        return $visitor->visitArray($data, $type, $context);
+        return sprintf('%s?%s=%s', $route, $fieldName, $entityId);
+    }
+
+    /**
+     * Get the mapping information
+     *
+     * @param array  $associationMap the name of the field
+     * @param string $className      the fully qualified class name
+     *
+     * @return string
+     *
+     * @throws \IC\Bundle\Base\SerializerBundle\Exception\NoMappingException when the parent mapping is not available.
+     */
+    private function getParentMappingInformation(array $associationMap, $className)
+    {
+        foreach ($associationMap as $fieldName => $mappingInfo) {
+            if ($mappingInfo['targetEntity'] !== $className) {
+                continue;
+            }
+
+            return array(
+                'fieldName'  => $fieldName,
+                'inversedBy' => $mappingInfo['inversedBy'],
+            );
+        }
+
+        throw new NoMappingException('Cannot find the parent mapping information for ' . $className);
     }
 }
