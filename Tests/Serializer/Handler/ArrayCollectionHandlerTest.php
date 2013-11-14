@@ -51,19 +51,32 @@ class ArrayCollectionHandlerTest extends TestCase
     /**
      * Test the class with different Doctrine collections
      *
-     * @param mix $collection
+     * @param mix     $collection
+     * @param integer $order
      *
      * @dataProvider dataProviderForTestSerializer
      */
-    public function testSerializeCollection($collection)
+    public function testSerializeCollection($collection, $order)
     {
         $visitor    = $this->createAbstractMock('JMS\Serializer\AbstractVisitor');
         $router     = $this->createMock('IC\Bundle\Core\SecurityBundle\Routing\Router');
         $context    = $this->createContextMock(ProxyHandlerFlag::ENABLE_HANDLER);
-        $type       = array();
+        $type       = array('');
+
+        3 === $order ? $returnValue = array(array('_route')) : $returnValue = array(1, 2, 3);
+
+        $visitor
+            ->expects($this->once())
+            ->method('visitArray')
+            ->with($this->anything())
+            ->will($this->returnValue($returnValue));
 
         $this->arrayCollection->setRouter($router);
-        $this->arrayCollection->serializeCollection($visitor, $collection, $type, $context);
+
+        $handler = $this->arrayCollection->serializeCollection($visitor, $collection, $type, $context);
+
+        $this->assertEquals($returnValue, $handler);
+
     }
 
     /**
@@ -74,9 +87,9 @@ class ArrayCollectionHandlerTest extends TestCase
     public function dataProviderForTestSerializer()
     {
         return array (
-            array ($this->createMock('Doctrine\Common\Collections\Collection')),
-            array ($this->createPersistentCollection()),
-            array ($this->createPersistentCollection('parent')),
+            array ($this->createMock('Doctrine\Common\Collections\Collection'), 1),
+            array ($this->createPersistentCollection(), 2),
+            array ($this->createPersistentCollection('parent'), 3),
         );
     }
 
