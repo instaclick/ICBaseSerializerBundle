@@ -77,7 +77,7 @@ class ProxyHandler implements SubscribingHandlerInterface
         }
 
         if ( ! ($entity instanceof Entity)) {
-            throw new SkipStepException('Skip the non-entity');
+            throw new SkipStepException('Skip the non-entity object of class ' . get_class($entity));
         }
 
         if ( ! $entity instanceof Proxy && $entity instanceof Entity) {

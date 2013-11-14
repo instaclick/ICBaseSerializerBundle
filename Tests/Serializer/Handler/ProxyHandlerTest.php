@@ -10,7 +10,7 @@ use IC\Bundle\Base\TestBundle\Test\TestCase;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\SerializationContext;
 use IC\Bundle\Base\SerializerBundle\Tests\MockObject\Context;
-use IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity;
+use IC\Bundle\Base\SerializerBundle\Tests\MockObject\CustomEntity as Entity;
 use IC\Bundle\Base\SerializerBundle\Tests\MockObject\Proxy;
 use PhpOption\None;
 
@@ -110,10 +110,25 @@ class ProxyHandlerTest extends TestCase
 
     /**
      * Should handle the serialization
+     *
+     * @expectedException JMS\Serializer\Exception\SkipStepException
      */
-    public function testShouldHandleSerialization()
+    public function testShouldSkipTheSerializerWithPureEntity()
     {
-        $entity      = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Core\UserBundle\Entity\User', 1);
+        $entity      = $this->createEntityMock();
+        $visitorMock = $this->createVisitorMock($entity);
+        $typeMock    = $this->createTypeMock();
+        $contextMock = $this->createContextMock(false);
+
+        $this->handler->serializeProxy($visitorMock, $entity, $typeMock, $contextMock);
+    }
+
+    /**
+     * Should handle the serialization
+     */
+    public function testShouldHandleSerializationWithUninitializedProxy()
+    {
+        $entity      = $this->createProxyMock(false);
         $visitorMock = $this->createVisitorMock($entity);
         $entityMock  = $entity;
         $typeMock    = $this->createTypeMock();

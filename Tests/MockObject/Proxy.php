@@ -14,7 +14,7 @@ use Doctrine\ORM\Proxy\Proxy as ProxyInterface;
  *
  * @author Juti Noppornpitak <jutin@nationalfibre.net>
  */
-class Proxy extends Entity implements ProxyInterface
+class Proxy extends CustomEntity implements ProxyInterface
 {
     /**
      * @var array properties to be lazy loaded, with keys being the property
