@@ -9,7 +9,7 @@ use IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata;
 use IC\Bundle\Base\TestBundle\Test\TestCase;
 
 /**
- * Serializer Service Test
+ * Property Metadata Test
  *
  * @group Unit
  * @group ICBaseSerializerBundle
