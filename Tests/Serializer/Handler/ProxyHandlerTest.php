@@ -13,6 +13,7 @@ use IC\Bundle\Base\SerializerBundle\Tests\MockObject\Context;
 use IC\Bundle\Base\SerializerBundle\Tests\MockObject\CustomEntity as Entity;
 use IC\Bundle\Base\SerializerBundle\Tests\MockObject\Proxy;
 use PhpOption\None;
+use PhpOption\Some;
 
 /**
  * Proxy Handler Test
@@ -51,14 +52,15 @@ class ProxyHandlerTest extends TestCase
     /**
      * Should skip the serializer when the root of the visitor is null
      *
-     * @expectedException JMS\Serializer\Exception\SkipStepException
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip the root
      */
     public function testShouldSkipTheSerializerWithVisitorRootIsNull()
     {
         $visitorMock = $this->createVisitorMock(null);
         $entityMock  = $this->createEntityMock();
         $typeMock    = $this->createTypeMock();
-        $contextMock = $this->createContextMock(None::create());
+        $contextMock = $this->createContextMock(Some::create('mock value'));
 
         $this->handler->serializeProxy($visitorMock, $entityMock, $typeMock, $contextMock);
     }
@@ -66,7 +68,8 @@ class ProxyHandlerTest extends TestCase
     /**
      * Should skip the serializer with the context
      *
-     * @expectedException JMS\Serializer\Exception\SkipStepException
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip no flag
      */
     public function testShouldSkipTheSerializerWithContext()
     {
@@ -81,7 +84,8 @@ class ProxyHandlerTest extends TestCase
     /**
      * Should skip the serializer with the initialized proxy
      *
-     * @expectedException JMS\Serializer\Exception\SkipStepException
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip the proxy
      */
     public function testShouldSkipTheSerializerWithInitializedProxy()
     {
@@ -96,7 +100,8 @@ class ProxyHandlerTest extends TestCase
     /**
      * Should skip the serializer with the non-proxy entity
      *
-     * @expectedException JMS\Serializer\Exception\SkipStepException
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip the entity
      */
     public function testShouldSkipTheSerializerWithNonProxy()
     {
@@ -109,9 +114,10 @@ class ProxyHandlerTest extends TestCase
     }
 
     /**
-     * Should handle the serialization
+     * Should skip the serializer with 'pure' entity
      *
-     * @expectedException JMS\Serializer\Exception\SkipStepException
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip the entity
      */
     public function testShouldSkipTheSerializerWithPureEntity()
     {
@@ -119,6 +125,22 @@ class ProxyHandlerTest extends TestCase
         $visitorMock = $this->createVisitorMock($entity);
         $typeMock    = $this->createTypeMock();
         $contextMock = $this->createContextMock(false);
+
+        $this->handler->serializeProxy($visitorMock, $entity, $typeMock, $contextMock);
+    }
+
+    /**
+     * Should skip the serializer for non instance of Entity
+     *
+     * @expectedException        \JMS\Serializer\Exception\SkipStepException
+     * @expectedExceptionMessage Skip the non-entity object of class stdClass
+     */
+    public function testShouldSkipTheSerializerWithNonEntity()
+    {
+        $entity      = new \stdClass();
+        $visitorMock = $this->createVisitorMock($entity);
+        $typeMock    = $this->createTypeMock();
+        $contextMock = $this->createContextMock(Some::create('mock value'));
 
         $this->handler->serializeProxy($visitorMock, $entity, $typeMock, $contextMock);
     }
