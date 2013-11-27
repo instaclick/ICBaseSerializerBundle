@@ -7,4 +7,8 @@
         <parameter key="jms_serializer.serializer.class">IC\Bundle\Base\SerializerBundle\Service\SerializerService</parameter>
     </parameters>
 
+    <services>
+        <service id="jms_serializer.object_constructor" alias="jms_serializer.doctrine_object_constructor" public="false" />
+    </services>
+
 </container>
