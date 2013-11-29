@@ -8,7 +8,6 @@ namespace IC\Bundle\Base\SerializerBundle\Tests\EventListener\Serializer;
 use IC\Bundle\Base\SerializerBundle\EventListener\Serializer\SerializeListener;
 use IC\Bundle\Base\TestBundle\Test\TestCase;
 use JMS\Serializer\SerializationContext;
-use Metadata\AdvancedMetadataFactoryInterface;
 use Metadata\ClassMetadata;
 
 /**
@@ -38,16 +37,6 @@ class SerializeListenerTest extends TestCase
     private $entityManager;
 
     /**
-     * @var \Metadata\AdvancedMetadataFactoryInterface
-     */
-    private $metadataFactory;
-
-    /**
-     * @var \JMS\Serializer\SerializationContext
-     */
-    private $context;
-
-    /**
      * {@inheritdoc}
      */
     protected function setUp()
@@ -55,12 +44,11 @@ class SerializeListenerTest extends TestCase
         parent::setUp();
 
         $this->translator      = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->metadataFactory = $this->createMetadataFactoryMock();
         $this->entityManager   = $this->createMock('Doctrine\ORM\EntityManager');
         $this->listener        = new SerializeListener();
 
         $this->listener->setTranslator($this->translator);
-        $this->listener->setMetadataFactory($this->metadataFactory);
+
         $this->listener->setEntityManager($this->entityManager);
     }
 
@@ -81,7 +69,7 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPreSerializeContainsNoKeyTranslatable()
     {
-        $event   = $this->createMockEvent('PreSerializeEvent');
+        $event   = $this->createEventMock('PreSerializeEvent');
         $context = new SerializationContext();
 
         $event->expects($this->once())
@@ -99,7 +87,7 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPreSerializeContainsKeyTranslatableNull()
     {
-        $event   = $this->createMockEvent('PreSerializeEvent');
+        $event   = $this->createEventMock('PreSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', null);
@@ -119,7 +107,7 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPreSerializeNoMetaDataTranslatable()
     {
-        $event   = $this->createMockEvent('PreSerializeEvent');
+        $event   = $this->createEventMock('PreSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', 'mock value');
@@ -135,10 +123,7 @@ class SerializeListenerTest extends TestCase
             ->method('getObject')
             ->will($this->returnValue($entity));
 
-        $this->metadataFactory->expects($this->once())
-            ->method('getMetadataForClass')
-            ->with(get_class($entity))
-            ->will($this->returnValue($classMetaData));
+        $metaDataFactory = $this->createClassMedataDataFactoryMock($entity, $classMetaData);
 
         $this->translator->expects($this->never())
             ->method('trans');
@@ -151,37 +136,15 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPreSerializeWithMetaDataTranslatable()
     {
-        $event   = $this->createMockEvent('PreSerializeEvent');
+        $event   = $this->createEventMock('PreSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', 'mock value');
 
-        $entity             = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity', 1);
-        $classMetadata      = new ClassMetadata($entity);
-        $propertyMetadataId = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
-            ->enableOriginalConstructor()
-            ->setConstructorArgs(array($entity, 'id'))
-            ->setMethods(array('isTranslatable', 'setValue', 'getValue'))
-            ->getMock();
-
-        $propertyMetadataName = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
-            ->enableOriginalConstructor()
-            ->setConstructorArgs(array($entity, 'name'))
-            ->setMethods(array('isTranslatable'))
-            ->getMock();
-
-        $entity->setID(1);
-
-        $classMetadata->addPropertyMetadata($propertyMetadataId);
-        $classMetadata->addPropertyMetadata($propertyMetadataName);
-
-        $propertyMetadataId->expects($this->once())
-            ->method('isTranslatable')
-            ->will($this->returnValue(true));
-
-        $propertyMetadataName->expects($this->once())
-            ->method('isTranslatable')
-            ->will($this->returnValue(false));
+        $entity               = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity', 1);
+        $propertyMetadataId   = $this->createPropertyMetadataTranslatableMock($entity);
+        $propertyMetadataName = $this->createPropertyMetadataNonTranslatableMock($entity);
+        $classMetaData        = $this->createClassMetaData($entity, $propertyMetadataId, $propertyMetadataName);
 
         $event->expects($this->once())
             ->method('getContext')
@@ -191,10 +154,7 @@ class SerializeListenerTest extends TestCase
             ->method('getObject')
             ->will($this->returnValue($entity));
 
-        $this->metadataFactory->expects($this->once())
-            ->method('getMetadataForClass')
-            ->with(get_class($entity))
-            ->will($this->returnValue($classMetadata));
+        $metaDataFactory = $this->createClassMedataDataFactoryMock($entity, $classMetaData);
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -218,7 +178,7 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPostSerializeContainsKeyTranslatableNull()
     {
-        $event   = $this->createMockEvent();
+        $event   = $this->createEventMock('PostSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', null);
@@ -234,11 +194,11 @@ class SerializeListenerTest extends TestCase
     }
 
     /**
-     * Test on postSerialize with no metaData translatable
+     * Test on postSerialize with no metadata translatable
      */
     public function testOnPostSerializeNoMetaDataTranslatable()
     {
-        $event   = $this->createMockEvent();
+        $event   = $this->createEventMock('PostSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', 'mock value');
@@ -254,10 +214,7 @@ class SerializeListenerTest extends TestCase
             ->method('getObject')
             ->will($this->returnValue($entity));
 
-        $this->metadataFactory->expects($this->once())
-            ->method('getMetadataForClass')
-            ->with(get_class($entity))
-            ->will($this->returnValue($classMetaData));
+        $metaDataFactory = $this->createClassMedataDataFactoryMock($entity, $classMetaData);
 
         $this->entityManager->expects($this->never())
             ->method('refresh');
@@ -270,37 +227,15 @@ class SerializeListenerTest extends TestCase
      */
     public function testOnPostSerializeWithMetaDataTranslatable()
     {
-        $event   = $this->createMockEvent('PreSerializeEvent');
+        $event   = $this->createEventMock('PreSerializeEvent');
         $context = new SerializationContext();
 
         $context->attributes->set('translatable', 'mock value');
 
-        $entity             = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity', 1);
-        $classMetadata      = new ClassMetadata($entity);
-        $propertyMetadataId = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
-            ->enableOriginalConstructor()
-            ->setConstructorArgs(array($entity, 'id'))
-            ->setMethods(array('isTranslatable', 'setValue', 'getValue'))
-            ->getMock();
-
-        $propertyMetadataName = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
-            ->enableOriginalConstructor()
-            ->setConstructorArgs(array($entity, 'name'))
-            ->setMethods(array('isTranslatable'))
-            ->getMock();
-
-        $entity->setID(1);
-
-        $classMetadata->addPropertyMetadata($propertyMetadataName);
-        $classMetadata->addPropertyMetadata($propertyMetadataId);
-
-        $propertyMetadataId->expects($this->once())
-            ->method('isTranslatable')
-            ->will($this->returnValue(true));
-
-        $propertyMetadataName->expects($this->once())
-            ->method('isTranslatable')
-            ->will($this->returnValue(false));
+        $entity               = $this->getHelper('Unit\Entity')->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity', 1);
+        $propertyMetadataId   = $this->createPropertyMetadataTranslatableMock($entity);
+        $propertyMetadataName = $this->createPropertyMetadataNonTranslatableMock($entity);
+        $classMetaData        = $this->createClassMetaData($entity, $propertyMetadataId, $propertyMetadataName);
 
         $event->expects($this->once())
             ->method('getContext')
@@ -310,10 +245,7 @@ class SerializeListenerTest extends TestCase
             ->method('getObject')
             ->will($this->returnValue($entity));
 
-        $this->metadataFactory->expects($this->once())
-            ->method('getMetadataForClass')
-            ->with(get_class($entity))
-            ->will($this->returnValue($classMetadata));
+        $metaDataFactory = $this->createClassMedataDataFactoryMock($entity, $classMetaData);
 
         $this->entityManager->expects($this->once())
             ->method('refresh')
@@ -323,32 +255,107 @@ class SerializeListenerTest extends TestCase
     }
 
     /**
+     * Create a non translatable propertyMetadata
+     *
+     * @param \IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity $entity
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createPropertyMetadataNonTranslatableMock($entity)
+    {
+        $propertyMetadataName = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array($entity, 'name'))
+            ->setMethods(array('isTranslatable'))
+            ->getMock();
+
+        $propertyMetadataName->expects($this->once())
+            ->method('isTranslatable')
+            ->will($this->returnValue(false));
+
+        return $propertyMetadataName;
+    }
+
+    /**
+     * Create a translatable propertyMetadata
+     *
+     * @param \IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity $entity
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createPropertyMetadataTranslatableMock($entity)
+    {
+        $propertyMetadataId = $this->getMockBuilder('IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata')
+            ->enableOriginalConstructor()
+            ->setConstructorArgs(array($entity, 'id'))
+            ->setMethods(array('isTranslatable', 'setValue', 'getValue'))
+            ->getMock();
+
+        $propertyMetadataId->expects($this->once())
+            ->method('isTranslatable')
+            ->will($this->returnValue(true));
+
+        return $propertyMetadataId;
+    }
+
+    /**
+     * Create a classMetaData
+     *
+     * @param \IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity   $entity               Entity
+     * @param \IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata $propertyMetadataId   PropertyMetadata translatable
+     * @param \IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata $propertyMetadataName PropertyMetadata non translatable
+     *
+     * @return ClassMetadata
+     */
+    private function createClassMetaData($entity, $propertyMetadataId, $propertyMetadataName)
+    {
+        $classMetaData = new ClassMetadata($entity);
+
+        $classMetaData->addPropertyMetadata($propertyMetadataName);
+        $classMetaData->addPropertyMetadata($propertyMetadataId);
+
+        return $classMetaData;
+    }
+
+    /**
+     * Create classMetaDataFactory
+     *
+     * @param \IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity $entity
+     * @param \Metadata\ClassMetadata                                  $classMetaData
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createClassMedataDataFactoryMock($entity, $classMetaData)
+    {
+        $metadataFactory = $this->getMockBuilder('Metadata\AdvancedMetadataFactoryInterface')
+            ->setMethods(array(
+                'getMetadataForClass',
+                'getAllClassNames'
+            ))->getMock();
+
+        $metadataFactory->expects($this->once())
+            ->method('getMetadataForClass')
+            ->with(get_class($entity))
+            ->will($this->returnValue($classMetaData));
+
+        $this->listener->setMetadataFactory($metadataFactory);
+
+        return $metadataFactory;
+    }
+
+    /**
      * Create a mock event
      *
      * @param string $type Define the type of event
      *
      * @return PHPUnit_Framework_MockObject_MockObject
      */
-    private function createMockEvent($type = 'PostSerializeEvent')
+    private function createEventMock($type)
     {
-        if ('PreSerializeEvent' == $type) {
+        if ('PreSerializeEvent' === $type) {
             return $this->createMock('JMS\Serializer\EventDispatcher\PreSerializeEvent');
         }
 
         return $this->createMock('JMS\Serializer\EventDispatcher\ObjectEvent');
-    }
-
-    /**
-     * Create a metadataFactory mock
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createMetadataFactoryMock()
-    {
-        return $this->getMockBuilder('Metadata\AdvancedMetadataFactoryInterface')
-                ->setMethods(array(
-                    'getMetadataForClass',
-                    'getAllClassNames'
-                ))->getMock();
     }
 }
