@@ -3,11 +3,10 @@ namespace IC\Bundle\Base\SerializerBundle\Serializer\Handler;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-use IC\Bundle\Core\SecurityBundle\Routing\Router;
+use IC\Bundle\Base\SecurityBundle\Routing\Router;
 use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use IC\Bundle\Base\SerializerBundle\Exception\NoMappingException;
 use JMS\Serializer\Context;
-use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\ArrayCollectionHandler as BaseArrayCollectionHandler;
 use JMS\Serializer\VisitorInterface;
 use PhpOption\None;
@@ -20,14 +19,14 @@ use PhpOption\None;
 class ArrayCollectionHandler extends BaseArrayCollectionHandler
 {
     /**
-     * @var \IC\Bundle\Core\SecurityBundle\Routing\Router
+     * @var \IC\Bundle\Base\SecurityBundle\Routing\Router
      */
     private $router;
 
     /**
      * Inject the Router
      *
-     * @param \IC\Bundle\Core\SecurityBundle\Routing\Router $router
+     * @param \IC\Bundle\Base\SecurityBundle\Routing\Router $router
      */
     public function setRouter(Router $router)
     {

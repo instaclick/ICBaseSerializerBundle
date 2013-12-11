@@ -9,7 +9,6 @@ use IC\Bundle\Base\TestBundle\Test\TestCase;
 use IC\Bundle\Base\SerializerBundle\Serializer\Handler\ArrayCollectionHandler;
 use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\SerializationContext;
-//use IC\Bundle\Base\SerializerBundle\Exception\NoMappingException;
 use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 
 /**
@@ -26,17 +25,7 @@ class ArrayCollectionHandlerTest extends TestCase
     /**
      * @var \IC\Bundle\Base\SerializerBundle\Serializer\Handler\ArrayCollectionHandler
      */
-    private $arrayCollection;
-
-    /**
-     * @var \IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler
-     */
-    private $entity;
-
-    /**
-     * @var \Doctrine\ORM\Mapping\ClassMetadata\PersistentCollection
-     */
-    private $persistentCollection;
+    private $arrayCollectionHandler;
 
     /**
      * Setup test. Initialize the tested class
@@ -45,7 +34,7 @@ class ArrayCollectionHandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->arrayCollection = new ArrayCollectionHandler();
+        $this->arrayCollectionHandler = new ArrayCollectionHandler();
     }
 
     /**
@@ -59,7 +48,7 @@ class ArrayCollectionHandlerTest extends TestCase
     public function testSerializeCollection($collection, $order)
     {
         $visitor    = $this->createAbstractMock('JMS\Serializer\AbstractVisitor');
-        $router     = $this->createMock('IC\Bundle\Core\SecurityBundle\Routing\Router');
+        $router     = $this->createMock('IC\Bundle\Base\SecurityBundle\Routing\Router');
         $context    = $this->createContextMock(ProxyHandlerFlag::ENABLE_HANDLER);
         $type       = array('');
 
@@ -71,9 +60,9 @@ class ArrayCollectionHandlerTest extends TestCase
             ->with($this->anything())
             ->will($this->returnValue($returnValue));
 
-        $this->arrayCollection->setRouter($router);
+        $this->arrayCollectionHandler->setRouter($router);
 
-        $handler = $this->arrayCollection->serializeCollection($visitor, $collection, $type, $context);
+        $handler = $this->arrayCollectionHandler->serializeCollection($visitor, $collection, $type, $context);
 
         $this->assertEquals($returnValue, $handler);
 
@@ -105,7 +94,7 @@ class ArrayCollectionHandlerTest extends TestCase
         $context     = $this->createContextMock(ProxyHandlerFlag::ENABLE_HANDLER);
         $type        = array();
 
-        $this->arrayCollection->serializeCollection($visitor, $collection, $type, $context);
+        $this->arrayCollectionHandler->serializeCollection($visitor, $collection, $type, $context);
     }
 
     /**
