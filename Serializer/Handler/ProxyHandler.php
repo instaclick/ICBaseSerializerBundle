@@ -7,7 +7,7 @@ use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\SkipStepException;
-use IC\Bundle\Core\SecurityBundle\Routing\Router;
+use IC\Bundle\Base\SecurityBundle\Routing\Router;
 use IC\Bundle\Base\ComponentBundle\Entity\Entity;
 use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use PhpOption\None;
@@ -21,14 +21,14 @@ use PhpOption\None;
 class ProxyHandler implements SubscribingHandlerInterface
 {
     /**
-     * @var \IC\Bundle\Core\SecurityBundle\Routing\Router
+     * @var \IC\Bundle\Base\SecurityBundle\Routing\Router
      */
     private $router;
 
     /**
      * Inject the Router
      *
-     * @param \IC\Bundle\Core\SecurityBundle\Routing\Router $router
+     * @param \IC\Bundle\Base\SecurityBundle\Routing\Router $router
      */
     public function setRouter(Router $router)
     {
