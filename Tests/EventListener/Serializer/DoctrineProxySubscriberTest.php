@@ -60,7 +60,7 @@ class DoctrineProxySubscriberTest extends TestCase
      */
     public function testOnPreSerialize()
     {
-        $object  = $this->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity', 1);
+        $object  = $this->createMock('IC\Bundle\Base\SerializerBundle\Tests\MockObject\Entity');
         $context = $this->createContext(Some::create('mock value'));
         $event   = $this->createEventMock($context, $object, 2);
 
