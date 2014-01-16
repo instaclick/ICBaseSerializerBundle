@@ -7,7 +7,7 @@
     	<import resource="services/handler.xml"/>
         <import resource="services/listener.xml"/>
         <import resource="services/metadata.xml"/>
-        <import resource="services/process.xml"/>
+        <import resource="services/service.xml"/>
     </imports>
 
 </container>
