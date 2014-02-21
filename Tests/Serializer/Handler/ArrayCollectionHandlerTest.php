@@ -48,7 +48,7 @@ class ArrayCollectionHandlerTest extends TestCase
     public function testSerializeCollection($collection, $order)
     {
         $visitor    = $this->createAbstractMock('JMS\Serializer\AbstractVisitor');
-        $router     = $this->createMock('IC\Bundle\Base\SecurityBundle\Routing\Router');
+        $router     = $this->createMock('Symfony\Bundle\FrameworkBundle\Routing\Router');
         $context    = $this->createContextMock(ProxyHandlerFlag::ENABLE_HANDLER);
         $type       = array('');
 

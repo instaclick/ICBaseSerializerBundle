@@ -5,7 +5,6 @@
 
     <parameters>
         <parameter key="jms_serializer.serializer.class">IC\Bundle\Base\SerializerBundle\Service\SerializerService</parameter>
-        <parameter key="router.class">IC\Bundle\Base\SecurityBundle\Routing\Router</parameter>
     </parameters>
 
     <services>

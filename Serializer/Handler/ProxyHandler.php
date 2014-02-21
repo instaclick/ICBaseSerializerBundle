@@ -7,13 +7,13 @@ use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Context;
 use JMS\Serializer\Exception\SkipStepException;
-use IC\Bundle\Base\SecurityBundle\Routing\Router;
 use IC\Bundle\Base\ComponentBundle\Entity\Entity;
 use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use PhpOption\None;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
- * This handler prevent to load the relationship and provide the REST Api entrypoint for it
+ * This handler prevent to load the relationship and provide the REST Api entry point for it
  *
  * @author Juti Noppornpitak <jutin@nationalfibre.net>
  * @author Kinn Coelho Julião <kinnj@nationalfibre.net>
@@ -21,14 +21,14 @@ use PhpOption\None;
 class ProxyHandler implements SubscribingHandlerInterface
 {
     /**
-     * @var \IC\Bundle\Base\SecurityBundle\Routing\Router
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
      */
     private $router;
 
     /**
      * Inject the Router
      *
-     * @param \IC\Bundle\Base\SecurityBundle\Routing\Router $router
+     * @param \Symfony\Bundle\FrameworkBundle\Routing\Router $router
      */
     public function setRouter(Router $router)
     {

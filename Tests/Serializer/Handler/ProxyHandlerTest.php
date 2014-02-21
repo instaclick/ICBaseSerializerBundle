@@ -265,7 +265,7 @@ class ProxyHandlerTest extends TestCase
      */
     private function createRouterMock()
     {
-        $proxyMock = $this->createMock('IC\Bundle\Base\SecurityBundle\Routing\Router');
+        $proxyMock = $this->createMock('Symfony\Bundle\FrameworkBundle\Routing\Router');
         $proxyMock->expects($this->any())
             ->method('generate')
             ->will($this->returnValue('http://localhost/api/v1/core/foo/bar/1'));

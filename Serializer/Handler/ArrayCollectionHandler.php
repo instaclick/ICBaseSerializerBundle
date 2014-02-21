@@ -3,30 +3,30 @@ namespace IC\Bundle\Base\SerializerBundle\Serializer\Handler;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
-use IC\Bundle\Base\SecurityBundle\Routing\Router;
 use IC\Bundle\Base\SerializerBundle\Entity\ProxyHandler as ProxyHandlerFlag;
 use IC\Bundle\Base\SerializerBundle\Exception\NoMappingException;
 use JMS\Serializer\Context;
 use JMS\Serializer\Handler\ArrayCollectionHandler as BaseArrayCollectionHandler;
 use JMS\Serializer\VisitorInterface;
 use PhpOption\None;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 /**
- * This handler prevent to load a collectio and provide the REST Api Filter entrypoint for it
+ * This handler prevent to load a collection and provide the REST Api Filter entry point for it
  *
  * @author Kinn Coelho Julião <kinnj@nationalfibre.net>
  */
 class ArrayCollectionHandler extends BaseArrayCollectionHandler
 {
     /**
-     * @var \IC\Bundle\Base\SecurityBundle\Routing\Router
+     * @var \Symfony\Bundle\FrameworkBundle\Routing\Router
      */
     private $router;
 
     /**
      * Inject the Router
      *
-     * @param \IC\Bundle\Base\SecurityBundle\Routing\Router $router
+     * @param \Symfony\Bundle\FrameworkBundle\Routing\Router $router
      */
     public function setRouter(Router $router)
     {
