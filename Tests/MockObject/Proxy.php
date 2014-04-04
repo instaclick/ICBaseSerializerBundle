@@ -71,7 +71,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
     public function __isInitialized()
@@ -80,7 +80,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
     public function __setInitialized($initialized)
@@ -89,7 +89,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
     public function __setInitializer(\Closure $initializer = null)
@@ -98,7 +98,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
     public function __getInitializer()
@@ -107,7 +107,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
     public function __setCloner(\Closure $cloner = null)
@@ -116,7 +116,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific cloning logic
      */
     public function __getCloner()
@@ -125,7 +125,7 @@ class Proxy extends CustomEntity implements ProxyInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      * @static
      */
