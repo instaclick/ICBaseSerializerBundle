@@ -305,7 +305,7 @@ class SerializeListenerTest extends TestCase
      * @param \IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata $propertyMetadataId   PropertyMetadata translatable
      * @param \IC\Bundle\Base\SerializerBundle\Metadata\PropertyMetadata $propertyMetadataName PropertyMetadata non translatable
      *
-     * @return ClassMetadata
+     * @return \Metadata\ClassMetadata
      */
     private function createClassMetaData($entity, $propertyMetadataId, $propertyMetadataName)
     {
@@ -348,7 +348,7 @@ class SerializeListenerTest extends TestCase
      *
      * @param string $type Define the type of event
      *
-     * @return PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function createEventMock($type)
     {
