@@ -15,7 +15,7 @@ use JMS\Serializer\EventDispatcher\CircularSerializationEvent;
  *
  * @group Unit
  * @group EventListener
- * 
+ *
  * @author Anthon Pang <anthonp@nationalfibre.net>
  */
 class CircularSerializationListenerTest extends TestCase
