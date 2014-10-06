@@ -36,9 +36,9 @@ class ProxyHandler implements SubscribingHandlerInterface
     }
 
     /**
-     * Get the subscriging methods
+     * Get the subscribing methods
      *
-     * @return array;
+     * @return array
      */
     public static function getSubscribingMethods()
     {

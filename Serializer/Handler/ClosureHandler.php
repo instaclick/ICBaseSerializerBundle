@@ -18,7 +18,7 @@ class ClosureHandler implements SubscribingHandlerInterface
     /**
      * Get the subscriging methods
      *
-     * @return array;
+     * @return array
      */
     public static function getSubscribingMethods()
     {
